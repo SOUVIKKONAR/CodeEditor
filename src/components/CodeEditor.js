@@ -3,38 +3,33 @@ import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
 const CodeEditor = () => {
   const [code, setCode] = useState('// Write your code here');
   const [output, setOutput] = useState('');
+  const [activeAction, setActiveAction] = useState('');
 
   const handleClick = async (type) => {
-    const promptMap = {
-      debug: `Debug the following code:\n\n${code}`,
-      explain: `Explain what this code does:\n\n${code}`,
-      optimize: `Optimize the following code:\n\n${code}`,
-    };
+    setActiveAction(type);
+    setOutput('');
 
     try {
-      const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: promptMap[type] }],
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/${type}`, {
+        code,
+        language: 'javascript',
+      });
 
-      setOutput(response.data.choices[0].message.content);
+      setOutput(response.data.result);
     } catch (err) {
-      setOutput('Error fetching AI response.');
+      setOutput(err.response?.data?.error || 'Error fetching AI response.');
       console.error(err);
+    } finally {
+      setActiveAction('');
     }
   };
+
+  const isLoading = Boolean(activeAction);
 
   return (
     <div>
@@ -42,13 +37,19 @@ const CodeEditor = () => {
         height="50vh"
         defaultLanguage="javascript"
         defaultValue={code}
-        onChange={(value) => setCode(value)}
+        onChange={(value) => setCode(value || '')}
         theme="vs-dark"
       />
       <div style={{ marginTop: '1rem' }}>
-        <button onClick={() => handleClick('debug')}>Debug</button>
-        <button onClick={() => handleClick('explain')}>Explain</button>
-        <button onClick={() => handleClick('optimize')}>Optimize</button>
+        <button disabled={isLoading} onClick={() => handleClick('debug')}>
+          {activeAction === 'debug' ? 'Debugging...' : 'Debug'}
+        </button>
+        <button disabled={isLoading} onClick={() => handleClick('explain')}>
+          {activeAction === 'explain' ? 'Explaining...' : 'Explain'}
+        </button>
+        <button disabled={isLoading} onClick={() => handleClick('optimize')}>
+          {activeAction === 'optimize' ? 'Optimizing...' : 'Optimize'}
+        </button>
       </div>
       <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap' }}>
         <strong>AI Response:</strong>
