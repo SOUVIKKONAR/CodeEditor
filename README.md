@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# IntelliCode
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AI-assisted code editor built with React, Monaco Editor, and an Express backend.
 
-## Available Scripts
+## Run the app
 
-In the project directory, you can run:
+Install frontend dependencies from the project root:
 
-### `npm start`
+```bash
+npm install
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Install and start the backend from `server/`:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+cd server
+npm install
+set OPENAI_API_KEY=your_api_key_here
+npm run dev
+```
 
-### `npm test`
+PowerShell users can set the key with:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```powershell
+$env:OPENAI_API_KEY="your_api_key_here"
+npm run dev
+```
 
-### `npm run build`
+The React app runs on `http://localhost:3000` and calls the API at `http://localhost:5000/api` by default. Override that with `REACT_APP_API_URL` if your backend is hosted elsewhere.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## API routes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `GET /api/health` checks the backend status.
+- `POST /api/debug` debugs submitted code.
+- `POST /api/explain` explains submitted code.
+- `POST /api/optimize` suggests improvements.
+- `POST /api/ai` accepts `{ "action": "debug" | "explain" | "optimize", "code": "..." }`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Each POST route accepts:
 
-### `npm run eject`
+```json
+{
+  "code": "function add(a, b) { return a + b; }",
+  "language": "javascript"
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Responses return:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```json
+{
+  "action": "explain",
+  "result": "..."
+}
+```
