@@ -16,15 +16,14 @@ Install and start the backend from `server/`:
 ```bash
 cd server
 npm install
-set OPENAI_API_KEY=your_api_key_here
+copy .env.example .env
 npm run dev
 ```
 
-PowerShell users can set the key with:
+Then edit `server/.env` and set your private OpenAI key:
 
-```powershell
-$env:OPENAI_API_KEY="your_api_key_here"
-npm run dev
+```env
+OPENAI_API_KEY=your_api_key_here
 ```
 
 The React app runs on `http://localhost:3000` and calls the API at `http://localhost:5000/api` by default. Override that with `REACT_APP_API_URL` if your backend is hosted elsewhere.
